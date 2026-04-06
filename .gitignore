@@ -1,0 +1,29 @@
+# Java & Spring Boot
+target/
+.agents/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# MacOS
+.DS_Store
