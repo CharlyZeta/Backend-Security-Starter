@@ -131,10 +131,10 @@ Una vez publicado en GitHub, puedes usar este starter agregando el repositorio d
 **2. Agregar Dependencia:**
 ```xml
 <dependency>
-    <groupId>com.github.[TU_USUARIO]</groupId>
-    <artifactId>[TU_REPOSITORIO]</artifactId>
-    <version>main-SNAPSHOT</version>
-</dependency>
+	    <groupId>com.github.CharlyZeta</groupId>
+	    <artifactId>Backend-Security-Starter</artifactId>
+	    <version>Tag</version>
+	</dependency>
 ```
 
 ---
