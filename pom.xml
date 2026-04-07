@@ -11,13 +11,13 @@
     </parent>
 
     <groupId>com.bss.security</groupId>
-    <artifactId>bss-security-parent</artifactId>
+    <artifactId>backend-security-starter-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Backend Security Starter Parent</name>
     <description>Parent project for Backend Security Starter (BSS)</description>
-    <url>https://github.com/[TU_USUARIO]/[TU_REPOSITORIO]</url>
+    <url>https://github.com/CharlyZeta/Backend-Security-Starter</url>
 
     <licenses>
         <license>
@@ -36,15 +36,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/[TU_USUARIO]/[TU_REPOSITORIO].git</connection>
-        <developerConnection>scm:git:ssh://github.com:[TU_USUARIO]/[TU_REPOSITORIO].git</developerConnection>
-        <url>https://github.com/[TU_USUARIO]/[TU_REPOSITORIO]/tree/main</url>
+        <connection>scm:git:git://github.com/CharlyZeta/Backend-Security-Starter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:CharlyZeta/Backend-Security-Starter.git</developerConnection>
+        <url>https://github.com/CharlyZeta/Backend-Security-Starter/tree/main</url>
     </scm>
 
     <modules>
-        <module>bss-security-core</module>
-        <module>bss-security-autoconfigure</module>
-        <module>bss-security-starter</module>
+        <module>backend-security-core</module>
+        <module>backend-security-autoconfigure</module>
+        <module>backend-security-starter</module>
     </modules>
 
     <properties>
@@ -58,12 +58,12 @@
             <!-- Internal Modules -->
             <dependency>
                 <groupId>com.bss.security</groupId>
-                <artifactId>bss-security-core</artifactId>
+                <artifactId>backend-security-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.bss.security</groupId>
-                <artifactId>bss-security-autoconfigure</artifactId>
+                <artifactId>backend-security-autoconfigure</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

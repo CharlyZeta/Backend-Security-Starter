@@ -1,5 +1,11 @@
 # 🚀 Backend Security Starter (BSS)
 
+[![JitPack](https://jitpack.io/v/CharlyZeta/Backend-Security-Starter.svg)](https://jitpack.io/#CharlyZeta/Backend-Security-Starter)
+![Java 21](https://img.shields.io/badge/Java-21-orange.svg?style=flat&logo=openjdk)
+![Spring Boot 3.3.4](https://img.shields.io/badge/Spring--Boot-3.3.4-brightgreen.svg?style=flat&logo=springboot)
+![Spring Security 6](https://img.shields.io/badge/Spring--Security-6.3.3-green.svg?style=flat&logo=springsecurity)
+![JWT](https://img.shields.io/badge/JWT-0.12.6-blue.svg?style=flat&logo=jsonwebtokens)
+
 Reusable and scalable security component (Starter) for microservices, prioritizing simplicity, functionality, and ease of integration for third parties.
 
 ## 🎯 Objetivo
@@ -11,8 +17,8 @@ El proyecto sigue una estructura multi-módulo para separar la lógica pura del 
 
 ```mermaid
 graph TD
-    A[bss-security-starter] --> B[bss-security-autoconfigure]
-    A --> C[bss-security-core]
+    A[backend-security-starter] --> B[backend-security-autoconfigure]
+    A --> C[backend-security-core]
     B --> C
     C --> D[Security Logic]
     C --> E[JWT Service]
@@ -20,9 +26,9 @@ graph TD
     B --> G[Spring Boot Magic]
 ```
 
-1.  **bss-security-core:** Contiene los filtros, servicios de JWT, modelos y las interfaces (`SecurityUser`, `RefreshTokenRepository`). Es totalmente agnóstico a la infraestructura.
-2.  **bss-security-autoconfigure:** Detecta la presencia del starter y configura automáticamente todos los beans, incluyendo Swagger y la Management API.
-3.  **bss-security-starter:** El módulo que los clientes importan. Agrega todas las dependencias necesarias con una sola declaración en el `pom.xml`.
+1.  **backend-security-core:** Contiene los filtros, servicios de JWT, modelos y las interfaces (`SecurityUser`, `RefreshTokenRepository`). Es totalmente agnóstico a la infraestructura.
+2.  **backend-security-autoconfigure:** Detecta la presencia del starter y configura automáticamente todos los beans, incluyendo Swagger y la Management API.
+3.  **backend-security-starter:** El módulo que los clientes importan. Agrega todas las dependencias necesarias con una sola declaración en el `pom.xml`.
 
 ## 🔐 Flujo de Autenticación y Refresh
 
@@ -131,11 +137,12 @@ Una vez publicado en GitHub, puedes usar este starter agregando el repositorio d
 **2. Agregar Dependencia:**
 ```xml
 <dependency>
-	    <groupId>com.github.CharlyZeta</groupId>
-	    <artifactId>Backend-Security-Starter</artifactId>
-	    <version>Tag</version>
-	</dependency>
+    <groupId>com.github.CharlyZeta.Backend-Security-Starter</groupId>
+    <artifactId>backend-security-starter</artifactId>
+    <version>1.0.0</version>
+</dependency>
 ```
+
 
 ---
 **Gerardo Maidana** | Backend Security Starter
