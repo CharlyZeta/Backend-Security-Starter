@@ -36,6 +36,18 @@ class SecurityDefaultTest {
     private JwtTokenService jwtTokenService;
 
     @Test
+    @DisplayName("GIVEN an unauthenticated request WHEN access any endpoint THEN return 401 Unauthorized with standardized JSON")
+    void givenUnauthenticatedRequest_whenAccessAnyEndpoint_thenReturn401StandardizedJson() throws Exception {
+        mockMvc.perform(get("/api/test"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message").value("Full authentication is required to access this resource"))
+                .andExpect(jsonPath("$.path").value("/api/test"))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
     @DisplayName("GIVEN an unauthenticated request WHEN access any endpoint THEN return 401 Unauthorized")
     void givenUnauthenticatedRequest_whenAccessAnyEndpoint_thenReturn401() throws Exception {
         mockMvc.perform(get("/api/test"))

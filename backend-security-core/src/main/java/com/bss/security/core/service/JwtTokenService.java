@@ -32,6 +32,9 @@ public class JwtTokenService {
                            @Value("${bss.security.jwt.expiration:3600}") long expiration,
                            @Value("${bss.security.jwt.refresh.expiration:604800}") long refreshExpiration,
                            RefreshTokenRepository refreshTokenRepository) {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalArgumentException("JWT Secret key must be at least 256 bits (32 characters) for HS256 algorithm.");
+        }
         this.secret = secret;
         this.expiration = expiration;
         this.refreshExpiration = refreshExpiration;
@@ -95,9 +98,6 @@ public class JwtTokenService {
     // --- Refresh Token Logic ---
 
     public RefreshToken createRefreshToken(String username) {
-        // Optionally delete old refresh token for this user to keep only one active session per user
-        refreshTokenRepository.deleteByUsername(username);
-
         RefreshToken refreshToken = RefreshToken.builder()
                 .username(username)
                 .token(UUID.randomUUID().toString())
@@ -107,14 +107,22 @@ public class JwtTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    public void deleteByToken(String token) {
+        refreshTokenRepository.deleteByToken(token);
+    }
+
+    public void cleanExpiredTokens() {
+        refreshTokenRepository.deleteExpired(Instant.now());
+    }
+
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            refreshTokenRepository.deleteByUsername(token.getUsername());
-            throw new JwtValidationException("Refresh token was expired. Please make a new signin request");
+            refreshTokenRepository.deleteByToken(token.getToken());
+            throw new JwtValidationException("Invalid authentication request");
         }
         return token;
     }

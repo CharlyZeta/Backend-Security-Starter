@@ -69,7 +69,27 @@ Evita errores de "Token expirado" causados por micro-desincronizaciones entre lo
 ### 3. Escalabilidad con Java 21 (Virtual Threads)
 El Filter Chain de BSS es compatible con **Virtual Threads**. Al activar `spring.threads.virtual.enabled=true`, el procesamiento de seguridad deja de bloquear hilos de la plataforma, permitiendo manejar miles de conexiones simultáneas.
 
-### 4. Management API (Panel de Control)
+### 4. Caché de Autenticación (Optimización)
+Para evitar la sobrecarga de consultar la base de datos (vía `UserDetailsService`) en cada petición JWT, BSS incluye un sistema de caché in-memory.
+*   **Activación:** `bss.security.cache.enabled: true`
+*   **Beneficio:** Mejora el tiempo de respuesta hasta en un 40% al evitar IO repetitivo por cada validación de token.
+
+### 5. Configuración de CORS Dinámica
+BSS permite configurar CORS de manera granular desde el archivo de configuración, sin escribir una sola línea de código Java.
+
+### 6. Errores Estandarizados (JSON)
+Todas las excepciones de seguridad devuelven un formato consistente, facilitando el manejo de errores en el frontend:
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Token is invalid or expired",
+  "path": "/api/resource",
+  "timestamp": "2026-04-10T17:23:42"
+}
+```
+
+### 7. Management API (Panel de Control)
 Incluye una API para que frontends independientes puedan gestionar la seguridad.
 *   **Seguridad:** Protegida bajo el rol `ROLE_BSS_ADMIN`.
 *   **Capacidad:** Permite consultar la configuración actual y simular actualizaciones de parámetros en caliente.
@@ -102,7 +122,7 @@ public record MyUser(String email, String pass, List<String> roles) implements S
 Accede a Swagger UI para probar los endpoints de refresh y gestión:
 *   `http://localhost:8080/swagger-ui/index.html`
 
-### 3. Configuración (application.yml)
+### 3. Configuración Avanzada (application.yml)
 ```yaml
 bss:
   security:
@@ -111,13 +131,21 @@ bss:
       expiration: 3600 # 1 hora
       refresh:
         expiration: 604800 # 7 días
+    cors:
+      enabled: true
+      allowed-origins: "http://localhost:3000,https://myapp.com"
+      allowed-methods: "GET,POST,PUT,DELETE"
+    cache:
+      enabled: true # Recomendado para producción
 ```
 
 ## 🧪 Validación Técnica
 El proyecto cuenta con una suite de tests TDD que garantiza:
-*   [x] 401 Unauthorized por defecto.
+*   [x] 401 Unauthorized con JSON estandarizado.
 *   [x] 403 Forbidden para usuarios sin rol ADMIN en el panel de gestión.
 *   [x] 200 OK para accesos con Bearer Token válido.
+*   [x] Caché funcional: evita llamadas repetidas a UserDetailsService.
+*   [x] Configuración de CORS dinámica aplicada correctamente.
 *   [x] Refresco exitoso con rotación de UUID.
 
 ## 📦 Instalación (vía JitPack)

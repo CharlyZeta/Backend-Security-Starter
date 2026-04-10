@@ -1,5 +1,6 @@
 package com.bss.security.core.filter;
 
+import com.bss.security.core.config.BssCacheProperties;
 import com.bss.security.core.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,12 +16,18 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
+    private final BssCacheProperties cacheProperties;
+    
+    // Simple in-memory cache for UserDetails
+    private final Map<String, UserDetails> userCache = new ConcurrentHashMap<>();
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userEmail = jwtTokenService.extractUsername(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails = getUserDetails(userEmail);
+            
             if (jwtTokenService.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -53,5 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private UserDetails getUserDetails(String username) {
+        if (cacheProperties.isEnabled()) {
+            return userCache.computeIfAbsent(username, userDetailsService::loadUserByUsername);
+        }
+        return userDetailsService.loadUserByUsername(username);
     }
 }

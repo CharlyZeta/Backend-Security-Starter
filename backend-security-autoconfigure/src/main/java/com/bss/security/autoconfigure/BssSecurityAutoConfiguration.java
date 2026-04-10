@@ -46,8 +46,9 @@ public class BssSecurityAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService jwtTokenService, 
-                                                         org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
-        return new JwtAuthenticationFilter(jwtTokenService, userDetailsService);
+                                                         org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
+                                                         com.bss.security.core.config.BssCacheProperties cacheProperties) {
+        return new JwtAuthenticationFilter(jwtTokenService, userDetailsService, cacheProperties);
     }
 
     @Bean
@@ -61,6 +62,12 @@ public class BssSecurityAutoConfiguration {
     @ConditionalOnMissingBean
     public BssManagementController bssManagementController() {
         return new BssManagementController();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public com.bss.security.core.service.RefreshTokenCleanupTask refreshTokenCleanupTask(JwtTokenService jwtTokenService) {
+        return new com.bss.security.core.service.RefreshTokenCleanupTask(jwtTokenService);
     }
 
     @Bean

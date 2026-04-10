@@ -5,7 +5,10 @@ import com.bss.security.core.dto.TokenRefreshResponse;
 import com.bss.security.core.exception.JwtValidationException;
 import com.bss.security.core.model.RefreshToken;
 import com.bss.security.core.service.JwtTokenService;
+import com.bss.security.core.exception.BssErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,28 +33,32 @@ public class BssAuthController {
 
     @Operation(summary = "Refresh Access Token", description = "Provides a new JWT Access Token given a valid Refresh Token")
     @ApiResponse(responseCode = "200", description = "Successful token refresh")
-    @ApiResponse(responseCode = "401", description = "Refresh token expired or invalid")
+    @ApiResponse(responseCode = "401", description = "Refresh token expired or invalid", 
+                 content = @Content(schema = @Schema(implementation = BssErrorResponse.class)))
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponse> refreshtoken(@RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return jwtTokenService.findByToken(requestRefreshToken)
                 .map(jwtTokenService::verifyExpiration)
-                .map(RefreshToken::getUsername)
-                .map(username -> {
+                .map(token -> {
+                    String username = token.getUsername();
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     
                     // Generate new access token
-                    String token = jwtTokenService.generateToken(
+                    String accessToken = jwtTokenService.generateToken(
                             userDetails.getUsername(), 
                             userDetails.getAuthorities().stream().map(auth -> auth.getAuthority()).collect(Collectors.toList())
                     );
                     
                     // Generate a new refresh token (Rotation)
                     RefreshToken newRefreshToken = jwtTokenService.createRefreshToken(username);
+                    
+                    // Delete ONLY the old token used in this rotation
+                    jwtTokenService.deleteByToken(requestRefreshToken);
 
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, newRefreshToken.getToken()));
+                    return ResponseEntity.ok(new TokenRefreshResponse(accessToken, newRefreshToken.getToken()));
                 })
-                .orElseThrow(() -> new JwtValidationException("Refresh token is not in database!"));
+                .orElseThrow(() -> new JwtValidationException("Invalid authentication request"));
     }
 }

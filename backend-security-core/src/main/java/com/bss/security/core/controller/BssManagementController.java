@@ -1,6 +1,10 @@
 package com.bss.security.core.controller;
 
+import com.bss.security.core.exception.BssErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +36,11 @@ public class BssManagementController {
     private long currentRefreshExpiration;
 
     @Operation(summary = "Get current security configuration")
+    @ApiResponse(responseCode = "200", description = "Current security configuration")
+    @ApiResponse(responseCode = "401", description = "Unauthorized", 
+                 content = @Content(schema = @Schema(implementation = BssErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden - Requires ROLE_BSS_ADMIN", 
+                 content = @Content(schema = @Schema(implementation = BssErrorResponse.class)))
     @GetMapping("/config")
     public ResponseEntity<Map<String, Object>> getConfig() {
         Map<String, Object> config = new HashMap<>();

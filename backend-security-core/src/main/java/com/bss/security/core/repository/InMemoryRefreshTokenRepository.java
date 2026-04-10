@@ -2,6 +2,7 @@ package com.bss.security.core.repository;
 
 import com.bss.security.core.model.RefreshToken;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,5 +29,15 @@ public class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
     @Override
     public void deleteByUsername(String username) {
         store.entrySet().removeIf(entry -> entry.getValue().getUsername().equals(username));
+    }
+
+    @Override
+    public void deleteByToken(String token) {
+        store.remove(token);
+    }
+
+    @Override
+    public void deleteExpired(Instant now) {
+        store.entrySet().removeIf(entry -> entry.getValue().getExpiryDate().isBefore(now));
     }
 }

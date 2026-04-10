@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,13 +46,23 @@ public class TestSecurityApp {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService jwtTokenService, UserDetailsService userDetailsService) {
-        return new JwtAuthenticationFilter(jwtTokenService, userDetailsService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService jwtTokenService, UserDetailsService userDetailsService, com.bss.security.core.config.BssCacheProperties cacheProperties) {
+        return new JwtAuthenticationFilter(jwtTokenService, userDetailsService, cacheProperties);
+    }
+
+    @Bean
+    public com.bss.security.core.service.RefreshTokenCleanupTask refreshTokenCleanupTask(JwtTokenService jwtTokenService) {
+        return new com.bss.security.core.service.RefreshTokenCleanupTask(jwtTokenService);
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> {
+        return new TestUserDetailsService();
+    }
+
+    public static class TestUserDetailsService implements UserDetailsService {
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
             if ("userTest".equals(username)) {
                 return new BssSecurityUserAdapter(new SecurityUser() {
                     @Override public String getUsername() { return "userTest"; }
@@ -68,7 +79,7 @@ public class TestSecurityApp {
                 });
             }
             throw new UsernameNotFoundException("User not found");
-        };
+        }
     }
 }
 

@@ -30,6 +30,14 @@ class JwtTokenServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a weak secret key WHEN initialize THEN throw IllegalArgumentException")
+    void givenWeakSecret_whenInitialize_thenThrowException() {
+        String weakSecret = "too-short";
+        assertThrows(IllegalArgumentException.class, () -> 
+            new JwtTokenService(weakSecret, expiration, refreshExpiration, refreshTokenRepository));
+    }
+
+    @Test
     @DisplayName("GIVEN a username and roles WHEN generate token THEN return a valid JWT")
     void givenUsernameAndRoles_whenGenerateToken_thenReturnValidJwt() {
         String token = jwtTokenService.generateToken("userTest", Collections.singletonList("ROLE_USER"));
