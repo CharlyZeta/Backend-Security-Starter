@@ -45,6 +45,7 @@
         <module>backend-security-core</module>
         <module>backend-security-autoconfigure</module>
         <module>backend-security-starter</module>
+        <module>backend-security-sample</module>
     </modules>
 
     <properties>

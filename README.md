@@ -122,6 +122,11 @@ public record MyUser(String email, String pass, List<String> roles) implements S
 Accede a Swagger UI para probar los endpoints de refresh y gestión:
 *   `http://localhost:8080/swagger-ui/index.html`
 
+### 3. Ejemplo de Implementación (Sample)
+Hemos creado un módulo de ejemplo completo en `backend-security-sample` para que puedas ver cómo integrar el starter en una aplicación real.
+*   **Código:** [backend-security-sample](./backend-security-sample)
+*   **Cómo ejecutar:** `mvn spring-boot:run -pl backend-security-sample`
+
 ### 3. Configuración Avanzada (application.yml)
 ```yaml
 bss:

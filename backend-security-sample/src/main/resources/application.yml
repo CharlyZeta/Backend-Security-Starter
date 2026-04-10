@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: bss-simple-sample
+  threads:
+    virtual:
+      enabled: true
+
+bss:
+  security:
+    jwt:
+      # Min 32 characters for HS256
+      secret: "esta-es-una-clave-secreta-para-el-ejemplo-de-32-caracteres"
+      expiration: 3600
+      refresh:
+        expiration: 604800
+    cors:
+      enabled: true
+      allowed-origins: "*"
+    cache:
+      enabled: true
+
+logging:
+  level:
+    com.bss.security: DEBUG
+    org.springframework.security: INFO
