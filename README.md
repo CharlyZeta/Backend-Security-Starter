@@ -1,6 +1,8 @@
 # 🚀 Backend Security Starter (BSS)
 
 [![JitPack](https://jitpack.io/v/CharlyZeta/Backend-Security-Starter.svg)](https://jitpack.io/#CharlyZeta/Backend-Security-Starter)
+![License](https://img.shields.io/github/license/CharlyZeta/Backend-Security-Starter)
+![Build Status](https://img.shields.io/github/actions/workflow/status/CharlyZeta/Backend-Security-Starter/maven-build.yml?branch=main)
 ![Java 21](https://img.shields.io/badge/Java-21-orange.svg?style=flat&logo=openjdk)
 ![Spring Boot 3.3.4](https://img.shields.io/badge/Spring--Boot-3.3.4-brightgreen.svg?style=flat&logo=springboot)
 ![Spring Security 6](https://img.shields.io/badge/Spring--Security-6.3.3-green.svg?style=flat&logo=springsecurity)
