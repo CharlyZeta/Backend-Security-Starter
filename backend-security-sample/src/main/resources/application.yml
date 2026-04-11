@@ -18,7 +18,8 @@ bss:
         expiration: 604800
     cors:
       enabled: true
-      allowed-origins: "*"
+      allowed-origins: "http://localhost:8081,http://localhost:3000"
+      allow-credentials: true
     cache:
       enabled: true
 
