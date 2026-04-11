@@ -10,7 +10,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.bss.security</groupId>
+    <groupId>com.github.CharlyZeta</groupId>
     <artifactId>backend-security-starter-parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -58,15 +58,16 @@
         <dependencies>
             <!-- Internal Modules -->
             <dependency>
-                <groupId>com.bss.security</groupId>
+                <groupId>com.github.CharlyZeta</groupId>
                 <artifactId>backend-security-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.bss.security</groupId>
+                <groupId>com.github.CharlyZeta</groupId>
                 <artifactId>backend-security-autoconfigure</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
 
             <!-- JWT -->
             <dependency>

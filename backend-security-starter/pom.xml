@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.bss.security</groupId>
+        <groupId>com.github.CharlyZeta</groupId>
         <artifactId>backend-security-starter-parent</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -15,11 +15,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.bss.security</groupId>
+            <groupId>com.github.CharlyZeta</groupId>
             <artifactId>backend-security-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.bss.security</groupId>
+            <groupId>com.github.CharlyZeta</groupId>
             <artifactId>backend-security-autoconfigure</artifactId>
         </dependency>
         <dependency>
