@@ -2,6 +2,7 @@ package com.bss.security.core.controller;
 
 import com.bss.security.core.dto.TokenRefreshRequest;
 import com.bss.security.core.dto.TokenRefreshResponse;
+import com.bss.security.core.exception.BssBadRequestException;
 import com.bss.security.core.exception.JwtValidationException;
 import com.bss.security.core.model.RefreshToken;
 import com.bss.security.core.service.JwtTokenService;
@@ -37,7 +38,12 @@ public class BssAuthController {
                  content = @Content(schema = @Schema(implementation = BssErrorResponse.class)))
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponse> refreshtoken(@RequestBody TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
+        String requestRefreshToken = request == null ? null : request.getRefreshToken();
+
+        // AC-005: un body vacío o sin refreshToken es un 400, nunca un NPE/500.
+        if (requestRefreshToken == null || requestRefreshToken.isBlank()) {
+            throw new BssBadRequestException("refreshToken is required");
+        }
 
         return jwtTokenService.findByToken(requestRefreshToken)
                 .map(jwtTokenService::verifyExpiration)

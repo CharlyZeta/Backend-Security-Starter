@@ -68,6 +68,16 @@ public class JwtTokenService {
         }
     }
 
+    /**
+     * Parsea y valida el token una única vez (firma + expiración) y devuelve sus claims.
+     * El filtro reutiliza el resultado para no verificar la firma dos veces por request (BR-005).
+     *
+     * @throws JwtValidationException si la firma es inválida, el token está expirado o malformado.
+     */
+    public Claims parseClaims(String token) {
+        return extractAllClaims(token);
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

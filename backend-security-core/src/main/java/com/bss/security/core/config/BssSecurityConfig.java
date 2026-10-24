@@ -28,6 +28,7 @@ public class BssSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final BssCorsProperties corsProperties;
 
     @Bean
@@ -42,8 +43,13 @@ public class BssSecurityConfig {
                     }
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
+                        // El despacho de error no puede requerir autenticación: si lo hace,
+                        // todo 403 y todo 500 real se reportan como 401 (BR-002).
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/auth/refresh").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/bss/**").hasAuthority("ROLE_BSS_ADMIN")

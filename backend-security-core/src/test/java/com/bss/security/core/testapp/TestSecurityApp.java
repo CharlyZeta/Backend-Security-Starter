@@ -1,5 +1,7 @@
 package com.bss.security.core.testapp;
 
+import com.bss.security.core.config.BssCacheProperties;
+import com.bss.security.core.config.JwtAccessDeniedHandler;
 import com.bss.security.core.config.JwtAuthenticationEntryPoint;
 import com.bss.security.core.filter.JwtAuthenticationFilter;
 import com.bss.security.core.model.BssSecurityUserAdapter;
@@ -7,19 +9,30 @@ import com.bss.security.core.model.SecurityUser;
 import com.bss.security.core.repository.InMemoryRefreshTokenRepository;
 import com.bss.security.core.repository.RefreshTokenRepository;
 import com.bss.security.core.service.JwtTokenService;
+import com.bss.security.core.service.RefreshTokenCleanupTask;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Aplicación de pruebas del módulo core.
+ *
+ * Nota (FIX-0001 / FEAT-0005): usa {@code scanBasePackages} de {@code com.bss.security.core},
+ * por lo que NO valida la autoconfiguración real. Esa verificación vive en
+ * {@code AutoConfigurationWiringTest} del módulo autoconfigure, que corre sin component scan.
+ */
 @SpringBootApplication(scanBasePackages = "com.bss.security.core")
 public class TestSecurityApp {
     public static void main(String[] args) {
@@ -41,18 +54,25 @@ public class TestSecurityApp {
     }
 
     @Bean
-    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint();
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        return new JwtAuthenticationEntryPoint(objectMapper);
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService jwtTokenService, UserDetailsService userDetailsService, com.bss.security.core.config.BssCacheProperties cacheProperties) {
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler(ObjectMapper objectMapper) {
+        return new JwtAccessDeniedHandler(objectMapper);
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService jwtTokenService,
+                                                            UserDetailsService userDetailsService,
+                                                            BssCacheProperties cacheProperties) {
         return new JwtAuthenticationFilter(jwtTokenService, userDetailsService, cacheProperties);
     }
 
     @Bean
-    public com.bss.security.core.service.RefreshTokenCleanupTask refreshTokenCleanupTask(JwtTokenService jwtTokenService) {
-        return new com.bss.security.core.service.RefreshTokenCleanupTask(jwtTokenService);
+    public RefreshTokenCleanupTask refreshTokenCleanupTask(JwtTokenService jwtTokenService) {
+        return new RefreshTokenCleanupTask(jwtTokenService);
     }
 
     @Bean
@@ -85,8 +105,15 @@ public class TestSecurityApp {
 
 @RestController
 class TestController {
+
     @GetMapping("/api/test")
     public String test() {
         return "Allowed!";
+    }
+
+    /** Endpoint que falla sin control: el 500 debe propagarse como 500, no como 401 (AC-007). */
+    @GetMapping("/api/boom")
+    public String boom() {
+        throw new IllegalStateException("boom");
     }
 }

@@ -3,14 +3,17 @@ package com.bss.security.autoconfigure;
 import com.bss.security.core.config.BssCacheProperties;
 import com.bss.security.core.config.BssCorsProperties;
 import com.bss.security.core.config.BssSecurityConfig;
+import com.bss.security.core.config.JwtAccessDeniedHandler;
 import com.bss.security.core.config.JwtAuthenticationEntryPoint;
 import com.bss.security.core.controller.BssAuthController;
 import com.bss.security.core.controller.BssManagementController;
+import com.bss.security.core.exception.BssSecurityExceptionHandler;
 import com.bss.security.core.filter.JwtAuthenticationFilter;
 import com.bss.security.core.repository.InMemoryRefreshTokenRepository;
 import com.bss.security.core.repository.RefreshTokenRepository;
 import com.bss.security.core.service.JwtTokenService;
 import com.bss.security.core.service.RefreshTokenCleanupTask;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -46,8 +49,24 @@ public class BssSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint();
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        // Se inyecta el mapper de la aplicación para respetar su configuración y
+        // serializar `timestamp` en ISO-8601 (BR-006).
+        return new JwtAuthenticationEntryPoint(objectMapper);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler(ObjectMapper objectMapper) {
+        return new JwtAccessDeniedHandler(objectMapper);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BssSecurityExceptionHandler bssSecurityExceptionHandler() {
+        // BR-003: el advice se registra desde la autoconfiguración, no por
+        // component scan del consumidor (que puede vivir en otro paquete).
+        return new BssSecurityExceptionHandler();
     }
 
     @Bean
