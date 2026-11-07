@@ -2,6 +2,7 @@ package com.bss.security.autoconfigure;
 
 import com.bss.security.core.config.BssCacheProperties;
 import com.bss.security.core.config.BssCorsProperties;
+import com.bss.security.core.config.BssIdentityConfig;
 import com.bss.security.core.config.BssSecurityConfig;
 import com.bss.security.core.config.JwtAccessDeniedHandler;
 import com.bss.security.core.config.JwtAuthenticationEntryPoint;
@@ -21,13 +22,14 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 @AutoConfiguration
-@Import(BssSecurityConfig.class)
+@Import({BssSecurityConfig.class, BssIdentityConfig.class})
 @EnableConfigurationProperties({BssCacheProperties.class, BssCorsProperties.class})
 public class BssSecurityAutoConfiguration {
 
@@ -79,6 +81,7 @@ public class BssSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "bss.security.mode", havingValue = "local", matchIfMissing = true)
     public BssAuthController bssAuthController(JwtTokenService jwtTokenService,
                                                UserDetailsService userDetailsService) {
         return new BssAuthController(jwtTokenService, userDetailsService);
@@ -92,6 +95,7 @@ public class BssSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "bss.security.mode", havingValue = "local", matchIfMissing = true)
     public RefreshTokenCleanupTask refreshTokenCleanupTask(JwtTokenService jwtTokenService) {
         return new RefreshTokenCleanupTask(jwtTokenService);
     }

@@ -1,7 +1,12 @@
 package com.bss.security.core.config;
 
+import com.bss.security.core.exception.BssConfigurationException;
 import com.bss.security.core.filter.JwtAuthenticationFilter;
+import com.bss.security.core.identity.BssIdentityMode;
+import com.bss.security.core.identity.BssIdentitySelector;
+import com.bss.security.core.identity.OidcAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,10 +35,16 @@ public class BssSecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final BssCorsProperties corsProperties;
+    private final BssIdentitySelector identitySelector;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   ObjectProvider<OidcAuthenticationFilter> oidcFilterProvider) throws Exception {
+        // Valida el modo siempre, incluso en local: es el fail-fast del arranque (BR-003, BR-004).
+        BssIdentityMode mode = identitySelector.mode();
+        OidcAuthenticationFilter oidcFilter = oidcFilterProvider.getIfAvailable();
+
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                     if (corsProperties.isEnabled()) {
@@ -55,9 +66,20 @@ public class BssSecurityConfig {
                         .requestMatchers("/api/bss/**").hasAuthority("ROLE_BSS_ADMIN")
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .authenticationProvider(authenticationProvider());
+
+        if (mode == BssIdentityMode.OIDC) {
+            if (oidcFilter == null) {
+                throw new BssConfigurationException(
+                        "Modo oidc activo sin filtro OIDC registrado: revisá la configuración del módulo "
+                                + BssIdentitySelector.MODULE_HINT + ".");
+            }
+            http.addFilterBefore(oidcFilter, UsernamePasswordAuthenticationFilter.class);
+        } else {
+            http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
+        return http.build();
     }
 
     @Bean
