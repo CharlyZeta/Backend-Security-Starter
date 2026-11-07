@@ -3,6 +3,7 @@ package com.bss.security.autoconfigure;
 import com.bss.security.core.config.BssCacheProperties;
 import com.bss.security.core.config.BssCorsProperties;
 import com.bss.security.core.config.BssIdentityConfig;
+import com.bss.security.core.config.BssOidcCoreConfig;
 import com.bss.security.core.config.BssSecurityConfig;
 import com.bss.security.core.config.BssVersionConfig;
 import com.bss.security.core.config.JwtAccessDeniedHandler;
@@ -31,7 +32,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 @AutoConfiguration
-@Import({BssSecurityConfig.class, BssIdentityConfig.class, BssVersionConfig.class})
+@Import({BssSecurityConfig.class, BssIdentityConfig.class, BssOidcCoreConfig.class, BssVersionConfig.class})
 @EnableConfigurationProperties({BssCacheProperties.class, BssCorsProperties.class})
 public class BssSecurityAutoConfiguration {
 

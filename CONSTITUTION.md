@@ -3,7 +3,7 @@
 Invariantes de arquitectura y de seguridad que **todo** contrato debe respetar.
 La capa `arch` del Loop verifica contra este archivo; un contrato que lo contradiga no se aprueba.
 
-Versión: 1.0 · 2026-11-06 · aplica a `main` a partir de `b811b39`.
+Versión: 1.1 · 2026-11-07 · aplica a `main` a partir de `b811b39`.
 
 ---
 
@@ -34,6 +34,9 @@ tokens MSAL, rate limiting y contadores.
 
 **Verificación:** el tipo de caché es acotado y sus propiedades están enlazadas a configuración.
 
+**Estado (2026-11-07):** incumplido hoy — la caché de `UserDetails` no aplica tope ni TTL efectivos;
+lo cubre FEAT-0001.
+
 ## C-04 · Ningún secreto, token o credencial en logs ni en errores
 
 Tokens, refresh tokens, `client_secret`, claves privadas y authorization codes no aparecen en
@@ -42,6 +45,9 @@ cliente son genéricos y estables.
 
 **Verificación:** grep de los literales de token en mensajes y ausencia de material sensible en
 respuestas de error.
+
+**Estado (2026-11-07):** incumplido hoy — `RefreshToken` (`@Data`) expone el token en su
+`toString()`; lo cubre FEAT-0002.
 
 ## C-05 · Un claim malformado nunca produce una excepción no controlada
 
@@ -68,9 +74,13 @@ corto, CORS con `*` + credenciales, `tenantId` vacío, skew fuera de rango, cert
 
 ## C-08 · Los modos de identidad no conviven por accidente
 
-Un despliegue autentica de **una** manera explícita: tokens propios de BSS (HS256) o tokens de
-un IdP (RS256/JWKS). La convivencia de ambos exige configuración explícita y una regla de
-selección por `iss`/`kid`; nunca dos decodificadores compitiendo por la misma request.
+Un despliegue autentica de **una** manera explícita, declarada en `bss.security.mode`:
+`local` (tokens propios de BSS, HS256 + refresh propio) u `oidc` (tokens de un IdP externo,
+RS/ES/PS con validación asimétrica, `bss.security.oidc.provider` obligatorio y una allowlist de
+issuers declarada). En modo `oidc` se desregistran los endpoints de refresh
+propios. La convivencia de ambos exige configuración explícita y una regla de selección por
+`iss`/`kid`; nunca dos decodificadores compitiendo por la misma request.
 
-**Verificación:** la configuración declara el modo; con el modo en `entra`, un token HS256 de BSS
-se rechaza y viceversa.
+**Verificación:** la configuración declara `bss.security.mode`; con `bss.security.mode=oidc` y
+`bss.security.oidc.provider=entra`, un token HS256 de BSS se rechaza y, con
+`bss.security.mode=local`, se rechaza un token RS256 del IdP.

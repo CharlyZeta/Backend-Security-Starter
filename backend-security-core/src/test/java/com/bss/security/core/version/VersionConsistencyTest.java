@@ -61,13 +61,23 @@ class VersionConsistencyTest {
     }
 
     @Test
-    @DisplayName("El CHANGELOG abre con la versión del proyecto")
-    void changelogTopEntryMatches() throws Exception {
+    @DisplayName("El CHANGELOG documenta la versión vigente (o abre con Unreleased)")
+    void changelogDocumentsCurrentVersion() throws Exception {
         String changelog = Files.readString(REPO_ROOT.resolve("CHANGELOG.md"));
         BssVersionInfo info = BssVersionProvider.load();
 
         Matcher matcher = Pattern.compile("^## \\[([^\\]]+)\\]", Pattern.MULTILINE).matcher(changelog);
         assertThat(matcher.find()).as("el CHANGELOG debe tener una entrada de versión").isTrue();
-        assertThat(matcher.group(1)).isEqualTo(info.version());
+
+        String top = matcher.group(1).trim();
+        if ("Unreleased".equalsIgnoreCase(top)) {
+            // Un bloque Unreleased es legítimo: lo que no puede faltar es la entrada
+            // de la versión que efectivamente se está construyendo.
+            assertThat(changelog)
+                    .as("CHANGELOG sin entrada para la versión vigente %s", info.version())
+                    .contains("## [" + info.version() + "]");
+        } else {
+            assertThat(top).isEqualTo(info.version());
+        }
     }
 }

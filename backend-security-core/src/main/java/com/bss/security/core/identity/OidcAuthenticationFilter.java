@@ -43,6 +43,13 @@ public class OidcAuthenticationFilter extends OncePerRequestFilter {
                 try {
                     Authentication authentication = support.authenticate(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (BssIdentityUnavailableException unavailable) {
+                    // El IdP no es alcanzable: no es una credencial inválida (FEAT-0007/BR-004).
+                    // 503 para que el cliente reintente y el monitoreo vea la caída del IdP.
+                    SecurityContextHolder.clearContext();
+                    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    response.setHeader("Retry-After", "5");
+                    return;
                 } catch (AuthenticationException ex) {
                     SecurityContextHolder.clearContext();
                 }

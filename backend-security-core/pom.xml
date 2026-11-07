@@ -26,6 +26,18 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- OIDC / JOSE (FEAT-0014): validación de tokens de IdPs externos vía Nimbus JOSE + JWT,
+             que Spring Security ya envuelve. No se implementa criptografía propia (C-02). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <!-- InvalidBearerTokenException vive en el módulo resource-server (arrastra oauth2-jose). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

@@ -38,6 +38,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
 
+        // RFC 6750: sin credenciales el desafío es "Bearer" a secas; si vino un bearer que no
+        // pudo validarse, se agrega error="invalid_token". El body JSON se mantiene (FIX-0001).
+        String authorization = request.getHeader("Authorization");
+        boolean presentedBearer = authorization != null && authorization.startsWith("Bearer ");
+        response.setHeader("WWW-Authenticate",
+                presentedBearer ? "Bearer error=\"invalid_token\"" : "Bearer");
+
         BssErrorResponse error = BssErrorResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error("Unauthorized")
