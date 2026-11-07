@@ -1,12 +1,15 @@
 # 🚀 Backend Security Starter (BSS)
 
+<!-- versions:start - bloque generado por scripts/sync-versions.mjs desde pom.xml; no editar a mano -->
 [![JitPack](https://jitpack.io/v/CharlyZeta/Backend-Security-Starter.svg)](https://jitpack.io/#CharlyZeta/Backend-Security-Starter)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/CharlyZeta/Backend-Security-Starter/releases)
 [![License](https://img.shields.io/github/license/CharlyZeta/Backend-Security-Starter)](LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/CharlyZeta/Backend-Security-Starter/maven-build.yml?branch=main)](https://github.com/CharlyZeta/Backend-Security-Starter/actions)
 ![Java 21](https://img.shields.io/badge/Java-21-orange.svg?style=flat&logo=openjdk)
 ![Spring Boot 3.3.4](https://img.shields.io/badge/Spring--Boot-3.3.4-brightgreen.svg?style=flat&logo=springboot)
-![Spring Security 6](https://img.shields.io/badge/Spring--Security-6.3.3-green.svg?style=flat&logo=springsecurity)
-![JWT](https://img.shields.io/badge/JWT-0.12.6-blue.svg?style=flat&logo=jsonwebtokens)
+![Spring Security 6.3.3](https://img.shields.io/badge/Spring--Security-6.3.3-green.svg?style=flat&logo=springsecurity)
+![JJWT 0.12.6](https://img.shields.io/badge/JJWT-0.12.6-blue.svg?style=flat&logo=jsonwebtokens)
+<!-- versions:end -->
 
 Reusable and scalable security component (Starter) for microservices, prioritizing simplicity, functionality, and ease of integration for third parties.
 

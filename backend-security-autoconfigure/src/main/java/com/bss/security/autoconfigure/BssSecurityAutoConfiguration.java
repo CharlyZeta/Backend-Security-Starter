@@ -4,6 +4,7 @@ import com.bss.security.core.config.BssCacheProperties;
 import com.bss.security.core.config.BssCorsProperties;
 import com.bss.security.core.config.BssIdentityConfig;
 import com.bss.security.core.config.BssSecurityConfig;
+import com.bss.security.core.config.BssVersionConfig;
 import com.bss.security.core.config.JwtAccessDeniedHandler;
 import com.bss.security.core.config.JwtAuthenticationEntryPoint;
 import com.bss.security.core.controller.BssAuthController;
@@ -14,6 +15,7 @@ import com.bss.security.core.repository.InMemoryRefreshTokenRepository;
 import com.bss.security.core.repository.RefreshTokenRepository;
 import com.bss.security.core.service.JwtTokenService;
 import com.bss.security.core.service.RefreshTokenCleanupTask;
+import com.bss.security.core.version.BssVersionInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -29,7 +31,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 @AutoConfiguration
-@Import({BssSecurityConfig.class, BssIdentityConfig.class})
+@Import({BssSecurityConfig.class, BssIdentityConfig.class, BssVersionConfig.class})
 @EnableConfigurationProperties({BssCacheProperties.class, BssCorsProperties.class})
 public class BssSecurityAutoConfiguration {
 
@@ -89,8 +91,8 @@ public class BssSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BssManagementController bssManagementController() {
-        return new BssManagementController();
+    public BssManagementController bssManagementController(BssVersionInfo versionInfo) {
+        return new BssManagementController(versionInfo);
     }
 
     @Bean
@@ -102,9 +104,13 @@ public class BssSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public OpenAPI customOpenAPI() {
+    public OpenAPI customOpenAPI(BssVersionInfo versionInfo) {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
+                .info(new io.swagger.v3.oas.models.info.Info()
+                        .title("Backend Security Starter")
+                        .description("Reusable security component for Spring Boot services")
+                        .version(versionInfo.version()))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(
                         new Components()

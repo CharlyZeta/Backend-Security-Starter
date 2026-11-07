@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.CharlyZeta</groupId>
         <artifactId>backend-security-starter-parent</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>backend-security-core</artifactId>
@@ -68,4 +68,24 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <resources>
+            <!-- Solo el archivo de versiones se filtra: nada más de resources debe interpolar. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>bss-version.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>bss-version.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
 </project>

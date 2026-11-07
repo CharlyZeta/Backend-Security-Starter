@@ -1,12 +1,14 @@
 package com.bss.security.core.controller;
 
 import com.bss.security.core.exception.BssErrorResponse;
+import com.bss.security.core.version.BssVersionInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +29,10 @@ import java.util.Map;
 @RequestMapping("/api/bss")
 @Tag(name = "BSS Management", description = "Management API for BSS configuration. Requires BSS_ADMIN role.")
 @SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
 public class BssManagementController {
+
+    private final BssVersionInfo versionInfo;
 
     @Value("${bss.security.jwt.expiration:3600}")
     private long currentExpiration;
@@ -44,6 +49,8 @@ public class BssManagementController {
     @GetMapping("/config")
     public ResponseEntity<Map<String, Object>> getConfig() {
         Map<String, Object> config = new HashMap<>();
+        config.put("version", versionInfo.version());
+        config.put("springBoot", versionInfo.springBoot());
         config.put("jwtExpiration", currentExpiration);
         config.put("refreshExpiration", currentRefreshExpiration);
         config.put("leewaySeconds", 60); // Hardcoded in service
